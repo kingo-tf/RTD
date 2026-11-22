@@ -13,9 +13,9 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  SM_BRANCH: "1.13"
-  # tf2r_attributes.inc is not part of stock SourceMod, it comes from this fork.
-  TF2R_INCLUDE_URL: https://raw.githubusercontent.com/kingo-tf/sourcemod/master/plugins/include/tf2r_attributes.inc
+  # The compiler and all includes come from the newest release of this SourceMod
+  # fork, so the plugin is built against the same build the servers run.
+  SM_REPO: kingo-tf/sourcemod
 
 jobs:
   release:
@@ -35,19 +35,32 @@ jobs:
           echo "tag=v$version-$GITHUB_RUN_NUMBER" >> "$GITHUB_OUTPUT"
           echo "sha=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
-      - name: Download SourceMod compiler
+      - name: Download SourceMod fork build
+        id: sourcemod
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          base="https://sm.alliedmods.net/smdrop/$SM_BRANCH"
-          latest=$(curl -fsSL "$base/sourcemod-latest-linux")
-          echo "Using $latest"
+          # Newest release that already has a Linux package. Builds from master
+          # are prereleases, and a release exists before its Linux package is
+          # uploaded, so "latest release" is not enough.
+          asset=$(gh api "repos/$SM_REPO/releases?per_page=20" --jq \
+            '[.[] | . as $r | .assets[] | select(.name | endswith("-linux.tar.gz")) | {tag: $r.tag_name, url: .browser_download_url}][0]')
+          if [ -z "$asset" ] || [ "$asset" = "null" ]; then
+            echo "No Linux package found in the releases of $SM_REPO" >&2
+            exit 1
+          fi
+          tag=$(jq -r .tag <<< "$asset")
+          url=$(jq -r .url <<< "$asset")
+          echo "Using $SM_REPO $tag"
           mkdir -p "$RUNNER_TEMP/sourcemod"
-          curl -fsSL "$base/$latest" | tar -xz -C "$RUNNER_TEMP/sourcemod" addons/sourcemod/scripting
-          echo "SM_SCRIPTING=$RUNNER_TEMP/sourcemod/addons/sourcemod/scripting" >> "$GITHUB_ENV"
-
-      - name: Download tf2r_attributes.inc
-        run: |
-          mkdir -p "$RUNNER_TEMP/tf2r-include"
-          curl -fsSL "$TF2R_INCLUDE_URL" -o "$RUNNER_TEMP/tf2r-include/tf2r_attributes.inc"
+          curl -fsSL "$url" | tar -xz -C "$RUNNER_TEMP/sourcemod" addons/sourcemod/scripting
+          scripting="$RUNNER_TEMP/sourcemod/addons/sourcemod/scripting"
+          if [ ! -f "$scripting/include/tf2r_attributes.inc" ]; then
+            echo "$SM_REPO $tag has no tf2r_attributes.inc" >&2
+            exit 1
+          fi
+          echo "SM_SCRIPTING=$scripting" >> "$GITHUB_ENV"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
       - name: Compile
         working-directory: scripting
@@ -58,7 +71,6 @@ jobs:
           "$spcomp" rtd.sp \
             -i "$SM_SCRIPTING/include" \
             -i include \
-            -i "$RUNNER_TEMP/tf2r-include" \
             -o "$RUNNER_TEMP/build/rtd.smx"
           test -s "$RUNNER_TEMP/build/rtd.smx"
 
@@ -85,4 +97,5 @@ jobs:
             "$RUNNER_TEMP/build/rtd.smx" \
             --target "$GITHUB_SHA" \
             --title "RTD ${{ steps.version.outputs.version }} (build $GITHUB_RUN_NUMBER, ${{ steps.version.outputs.sha }})" \
+            --notes "Built with ${SM_REPO} ${{ steps.sourcemod.outputs.tag }}." \
             --generate-notes
