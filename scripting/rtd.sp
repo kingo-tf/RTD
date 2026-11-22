@@ -42,7 +42,7 @@
 #define FREEZECAM_DURATION	5.0
 
 #if defined _updater_included
-#define UPDATE_URL		"https://phil25.github.io/RTD/update.txt"
+#define UPDATE_URL		"https://raw.githubusercontent.com/kingo-tf/RTD/master/update.txt"
 #endif
 
 //#define DEBUG // log extra messages
@@ -113,7 +113,7 @@ public APLRes AskPluginLoad2(Handle hMyself, bool bLate, char[] sError, int iErr
 	GetGameFolderName(sGame, sizeof(sGame));
 	if (!StrEqual(sGame, "tf") && !StrEqual(sGame, "tf_ktbm"))
 	{
-		Format(sError, iErrorSize, CONS_PREFIX ... " This plugin only works for Team Fortress 2.");
+		Format(sError, iErrorSize, CONS_PREFIX ... " This plugin only works for Team Fortress 2: Rebalanced.");
 		return APLRes_Failure;
 	}
 
