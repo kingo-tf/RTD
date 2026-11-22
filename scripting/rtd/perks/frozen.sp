@@ -53,7 +53,7 @@ enum Frozen_State
 	Frozen_State_Muffle,
 }
 
-DEFINE_CALL_APPLY_REMOVE(Frozen)
+public DEFINE_CALL_APPLY_REMOVE(Frozen)
 
 public void Frozen_Init(const Perk perk)
 {

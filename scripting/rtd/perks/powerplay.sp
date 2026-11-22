@@ -57,7 +57,7 @@ enum PowerPlay_MeleeFlags
 	PowerPlay_MeleeFlags_SpyCicle = 1 << 1,
 }
 
-DEFINE_CALL_APPLY_REMOVE(PowerPlay)
+public DEFINE_CALL_APPLY_REMOVE(PowerPlay)
 
 public void PowerPlay_Init(const Perk perk)
 {
@@ -122,17 +122,18 @@ void PowerPlay_Apply(const int client)
 	int iMelee = GetPlayerWeaponSlot(client, 2);
 	if (iMelee > MaxClients && IsValidEntity(iMelee))
 	{
-		TF2Attrib_SetByDefIndex(iMelee, Attribs.MeleeRange, 1.1);
+		TF2R_SetAttribute(iMelee, Attribs.MeleeRange, 1.1);
 
 		char sClassname[32];
 		GetEntityClassname(iMelee, sClassname, sizeof(sClassname));
 
 		if (StrEqual(sClassname, "tf_weapon_knife"))
 		{
+			float fMeltsInFire;
 			Cache[client].MeleeFlags |= view_as<int>(PowerPlay_MeleeFlags_Knife);
 
 			if (GetEntProp(iMelee, Prop_Send, "m_iItemDefinitionIndex") == 649
-			|| TF2Attrib_GetByDefIndex(iMelee, Attribs.MeltsInFire) != Address_Null)
+			|| TF2R_GetItemAttribute(iMelee, Attribs.MeltsInFire, fMeltsInFire))
 				Cache[client].MeleeFlags |= view_as<int>(PowerPlay_MeleeFlags_SpyCicle);
 		}
 	}
@@ -144,7 +145,7 @@ void PowerPlay_Apply(const int client)
 		Shared[client].AddCritBoost(client, CritBoost_Full);
 
 	TF2_AddCondition(client, TFCond_SpeedBuffAlly);
-	TF2Attrib_SetByDefIndex(client, Attribs.AirblastVulnerability, 0.2);
+	TF2R_SetAttribute(client, Attribs.AirblastVulnerability, 0.2);
 	ApplyPreventCapture(client);
 	SetOverlay(client, ClientOverlay_Burning);
 
@@ -214,13 +215,13 @@ public void PowerPlay_RemovePerk(const int client, const RTDRemoveReason eRemove
 		Shared[client].RemoveCritBoost(client, CritBoost_Full);
 
 	TF2_RemoveCondition(client, TFCond_SpeedBuffAlly);
-	TF2Attrib_RemoveByDefIndex(client, Attribs.AirblastVulnerability);
+	TF2R_RemoveAttribute(client, Attribs.AirblastVulnerability);
 	RemovePreventCapture(client);
 	SetOverlay(client, ClientOverlay_None);
 
 	int iMelee = GetPlayerWeaponSlot(client, 2);
 	if (iMelee > MaxClients && IsValidEntity(iMelee))
-		TF2Attrib_RemoveByDefIndex(iMelee, Attribs.MeleeRange);
+		TF2R_RemoveAttribute(iMelee, Attribs.MeleeRange);
 }
 
 public void PowerPlay_OnGlowUpdate(const int client)

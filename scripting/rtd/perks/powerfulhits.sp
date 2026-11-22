@@ -18,7 +18,7 @@
 
 #define Multiplier Float[0]
 
-DEFINE_CALL_APPLY_REMOVE(PowerfulHits)
+public DEFINE_CALL_APPLY_REMOVE(PowerfulHits)
 
 public void PowerfulHits_Init(const Perk perk)
 {
@@ -38,7 +38,7 @@ public void PowerfulHits_RemovePerk(const int client, const RTDRemoveReason eRem
 	{
 		int iWeapon = GetPlayerWeaponSlot(client, i);
 		if (iWeapon > MaxClients && IsValidEntity(iWeapon))
-			TF2Attrib_RemoveByDefIndex(iWeapon, Attribs.Damage);
+			TF2R_RemoveAttribute(iWeapon, Attribs.Damage);
 	}
 }
 
@@ -48,7 +48,7 @@ public void PowerfulHits_Apply(const int client)
 	{
 		int iWeapon = GetPlayerWeaponSlot(client, i);
 		if (iWeapon > MaxClients && IsValidEntity(iWeapon))
-			TF2Attrib_SetByDefIndex(iWeapon, Attribs.Damage, Cache[client].Multiplier);
+			TF2R_SetAttribute(iWeapon, Attribs.Damage, Cache[client].Multiplier);
 	}
 }
 

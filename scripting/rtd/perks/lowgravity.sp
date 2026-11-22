@@ -21,7 +21,7 @@
 #define Gravity Float[0]
 #define MaxBoostSquared Float[1]
 
-DEFINE_CALL_APPLY_REMOVE(LowGravity)
+public DEFINE_CALL_APPLY_REMOVE(LowGravity)
 
 public void LowGravity_Init(const Perk perk)
 {
@@ -40,7 +40,7 @@ public void LowGravity_ApplyPerk(int client, Perk perk)
 
 	if (Cache[client].JumpMode)
 	{
-		TF2Attrib_SetByDefIndex(client, Attribs.JumpHeight, 1.0 / fMultiplier);
+		TF2R_SetAttribute(client, Attribs.JumpHeight, 1.0 / fMultiplier);
 	}
 	else
 	{
@@ -48,14 +48,14 @@ public void LowGravity_ApplyPerk(int client, Perk perk)
 	}
 
 	if (!Cache[client].FallDamage)
-		TF2Attrib_SetByDefIndex(client, Attribs.NoFallDamage, 1.0);
+		TF2R_SetAttribute(client, Attribs.NoFallDamage, 1.0);
 }
 
 public void LowGravity_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	if (Cache[client].JumpMode)
 	{
-		TF2Attrib_RemoveByDefIndex(client, Attribs.JumpHeight);
+		TF2R_RemoveAttribute(client, Attribs.JumpHeight);
 	}
 	else
 	{
@@ -63,7 +63,7 @@ public void LowGravity_RemovePerk(const int client, const RTDRemoveReason eRemov
 	}
 
 	if (!Cache[client].FallDamage)
-		TF2Attrib_RemoveByDefIndex(client, Attribs.NoFallDamage);
+		TF2R_RemoveAttribute(client, Attribs.NoFallDamage);
 }
 
 bool LowGravity_OnPlayerRunCmd(const int client, int& iButtons, float fVel[3], float fAng[3])

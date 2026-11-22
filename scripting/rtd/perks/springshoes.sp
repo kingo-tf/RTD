@@ -18,7 +18,7 @@
 
 #define SPRING_JUMP "misc/halloween/duck_pickup_neg_01.wav"
 
-DEFINE_CALL_APPLY_REMOVE(SpringShoes)
+public DEFINE_CALL_APPLY_REMOVE(SpringShoes)
 
 public void SpringShoes_Init(const Perk perk)
 {
@@ -27,14 +27,14 @@ public void SpringShoes_Init(const Perk perk)
 
 public void SpringShoes_ApplyPerk(const int client, const Perk perk)
 {
-	TF2Attrib_SetByDefIndex(client, Attribs.PreventJump, 1.0);
+	TF2R_SetAttribute(client, Attribs.PreventJump, 1.0);
 
 	Cache[client].Repeat(0.25, SpringShoes_ForceJump);
 }
 
 public void SpringShoes_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
-	TF2Attrib_RemoveByDefIndex(client, Attribs.PreventJump);
+	TF2R_RemoveAttribute(client, Attribs.PreventJump);
 }
 
 

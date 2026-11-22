@@ -21,7 +21,7 @@
 #include <sdktools>
 #include <sdkhooks>
 #include <tf2_stocks>
-#include <tf2attributes>
+#include <tf2r_attributes>
 
 #undef REQUIRE_PLUGIN
 #tryinclude <updater>
@@ -111,7 +111,7 @@ public APLRes AskPluginLoad2(Handle hMyself, bool bLate, char[] sError, int iErr
 	sGame[0] = '\0';
 
 	GetGameFolderName(sGame, sizeof(sGame));
-	if (!StrEqual(sGame, "tf"))
+	if (!StrEqual(sGame, "tf") && !StrEqual(sGame, "tf_ktbm"))
 	{
 		Format(sError, iErrorSize, CONS_PREFIX ... " This plugin only works for Team Fortress 2.");
 		return APLRes_Failure;
@@ -942,7 +942,7 @@ void PrecachePerkSounds()
 	char sBuffer[64];
 	PerkIter iter = new PerkContainerIter(-1);
 
-	while ((++iter).Perk())
+	while (PerkIter_Next(iter).Perk())
 	{
 		iter.Perk().GetSound(sBuffer, 64);
 		PrecacheSound(sBuffer);
@@ -955,7 +955,7 @@ void InitPerks()
 {
 	PerkIter iter = new PerkContainerIter(-1);
 
-	while ((++iter).Perk())
+	while (PerkIter_Next(iter).Perk())
 	{
 		iter.Perk().InitInternal();
 	}
@@ -967,7 +967,7 @@ void ParseDisabledPerks()
 {
 	PerkIter iter = new PerkContainerIter(-1);
 
-	while ((++iter).Perk())
+	while (PerkIter_Next(iter).Perk())
 		iter.Perk().Enabled = true;
 
 	delete iter;
@@ -1245,7 +1245,7 @@ Perk RollPerk(const int client=0, const int iRollFlags=ROLLFLAG_NONE, const char
 
 	if (bFilter)
 	{
-		while ((perk = (++iter).Perk()))
+		while ((perk = PerkIter_Next(iter).Perk()))
 			if (perk.IsAptForSetupOf(client, iRollFlags))
 			{
 				list.Push(perk);
@@ -1261,7 +1261,7 @@ Perk RollPerk(const int client=0, const int iRollFlags=ROLLFLAG_NONE, const char
 	{
 		bool bBeGood = GoodRoll(client);
 
-		while ((perk = (++iter).Perk()))
+		while ((perk = PerkIter_Next(iter).Perk()))
 			if (perk.Good == bBeGood && perk.IsAptFor(client, iRollFlags))
 			{
 				list.Push(perk);
@@ -1365,7 +1365,7 @@ Menu BuildDescriptionMenu(const int client)
 	PerkIter iter = new PerkContainerIter(-1);
 	Perk perk = null;
 
-	while ((perk = (++iter).Perk()))
+	while ((perk = PerkIter_Next(iter).Perk()))
 	{
 		perk.GetToken(sPerkToken, sizeof(sPerkToken));
 		perk.GetName(sPerkName, sizeof(sPerkName));
@@ -1887,7 +1887,7 @@ void DisableModulePerks(Handle hPlugin)
 
 	PerkIter iter = new PerkContainerIter(-1);
 
-	while ((perk = (++iter).Perk()))
+	while ((perk = PerkIter_Next(iter).Perk()))
 	{
 		if (perk.External && perk.Parent == hPlugin)
 		{

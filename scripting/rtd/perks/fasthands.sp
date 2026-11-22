@@ -19,7 +19,7 @@
 #define Attack Float[0]
 #define Reload Float[1]
 
-DEFINE_CALL_APPLY_REMOVE(FastHands)
+public DEFINE_CALL_APPLY_REMOVE(FastHands)
 
 public void FastHands_Init(const Perk perk)
 {
@@ -43,8 +43,8 @@ public void FastHands_RemovePerk(const int client, const RTDRemoveReason eRemove
 		if (iWeapon <= MaxClients || !IsValidEntity(iWeapon))
 			continue;
 
-		TF2Attrib_RemoveByDefIndex(iWeapon, Attribs.FireRate);
-		TF2Attrib_RemoveByDefIndex(iWeapon, Attribs.ReloadSpeed);
+		TF2R_RemoveAttribute(iWeapon, Attribs.FireRate);
+		TF2R_RemoveAttribute(iWeapon, Attribs.ReloadSpeed);
 	}
 }
 
@@ -56,8 +56,8 @@ public void FastHands_Apply(const int client)
 		if (iWeapon <= MaxClients || !IsValidEntity(iWeapon))
 			continue;
 
-		TF2Attrib_SetByDefIndex(iWeapon, Attribs.FireRate, Cache[client].Attack);
-		TF2Attrib_SetByDefIndex(iWeapon, Attribs.ReloadSpeed, Cache[client].Reload);
+		TF2R_SetAttribute(iWeapon, Attribs.FireRate, Cache[client].Attack);
+		TF2R_SetAttribute(iWeapon, Attribs.ReloadSpeed, Cache[client].Reload);
 	}
 
 }

@@ -54,7 +54,7 @@ methodmap PerkIter < ArrayList
 		{
 			if (iId >= list.Length || iId < 0)
 			{
-				this.Set(1, view_as<Perk>(null));
+				this.Set(1, 0); // null handle
 			}
 			else
 			{
@@ -76,15 +76,15 @@ methodmap PerkIter < ArrayList
 	}
 }
 
-/* prefix ++ operator */
-stock PerkIter operator++(PerkIter iter)
+/* advances the iterator and returns it (was prefix ++ operator, removed in SourcePawn 1.13) */
+stock PerkIter PerkIter_Next(PerkIter iter)
 {
 	iter.Next();
 	return iter;
 }
 
-/* prefix -- operator */
-stock PerkIter operator--(PerkIter iter)
+/* steps the iterator back and returns it (was prefix -- operator) */
+stock PerkIter PerkIter_Prev(PerkIter iter)
 {
 	iter.Prev();
 	return iter;
@@ -98,7 +98,7 @@ methodmap PerkContainerIter < PerkIter
 		ArrayList list = new ArrayList(_, 3);
 		list.Set(0, iId);
 		list.Set(1, g_hPerkContainer.GetFromId(iId));
-		list.Set(2, view_as<PerkList>(null));
+		list.Set(2, 0); // null handle
 
 		return view_as<PerkContainerIter>(list);
 	}
@@ -115,7 +115,7 @@ methodmap PerkListIter < PerkIter
 		int iLen = list.Length;
 		if (iId >= iLen || iId < 0)
 		{
-			data.Set(1, view_as<Perk>(null));
+			data.Set(1, 0); // null handle
 		}
 		else
 		{

@@ -401,7 +401,7 @@ stock int GetOppositeTeamOf(const int client)
 
 stock float GetCaptureValue(const int client)
 {
-	// float instead of int so the return value can be used in a TF2Attrib call
+	// float instead of int so the return value can be used in a TF2R_SetAttribute call
 	float fValue = 1.0;
 
 	fValue += view_as<int>(TF2_GetPlayerClass(client) == TFClass_Scout);
@@ -414,7 +414,7 @@ stock float GetCaptureValue(const int client)
 				fValue += 1.0;
 	}
 
-	// We could iterate weapons and use TF2Attrib_ListDefIndices on each of them instead of checking
+	// We could iterate weapons and use TF2R_GetItemAttributes on each of them instead of checking
 	// for Pain Train directly, but native attributes cannot be read without parsing the itemschema,
 	// which I don't think is worth for the ~1% of cases when it's needed.
 
@@ -423,15 +423,15 @@ stock float GetCaptureValue(const int client)
 
 stock void ApplyPreventCapture(const int client)
 {
-	TF2Attrib_SetByDefIndex(client, 400, 1.0); // cannot pick up intel
-	TF2Attrib_SetByDefIndex(client, 68, -GetCaptureValue(client)); // balance capture value to 0
+	TF2R_SetAttribute(client, 400, 1.0); // cannot pick up intel
+	TF2R_SetAttribute(client, 68, -GetCaptureValue(client)); // balance capture value to 0
 	FakeClientCommandEx(client, "dropitem"); // in case intel is already picked up
 }
 
 stock void RemovePreventCapture(const int client)
 {
-	TF2Attrib_RemoveByDefIndex(client, 400);
-	TF2Attrib_RemoveByDefIndex(client, 68);
+	TF2R_RemoveAttribute(client, 400);
+	TF2R_RemoveAttribute(client, 68);
 }
 
 stock int GetUniqueId(const int client, const int iOther)
@@ -1292,12 +1292,12 @@ stock void SetSpeed(int client, float fBase, float fMul=1.0)
 {
 	if (fMul == 1.0)
 	{
-		TF2Attrib_RemoveByDefIndex(client, 107);
+		TF2R_RemoveAttribute(client, 107);
 		SetEntPropFloat(client, Prop_Send, "m_flMaxspeed", fBase);
 	}
 	else
 	{
-		TF2Attrib_SetByDefIndex(client, 107, fMul);
+		TF2R_SetAttribute(client, 107, fMul);
 		SetEntPropFloat(client, Prop_Send, "m_flMaxspeed", fBase *fMul);
 	}
 }
@@ -1307,11 +1307,11 @@ stock void SetSpeedEx(int client, float fMul=1.0)
 {
 	if (fMul == 1.0)
 	{
-		TF2Attrib_RemoveByDefIndex(client, 107);
+		TF2R_RemoveAttribute(client, 107);
 	}
 	else
 	{
-		TF2Attrib_SetByDefIndex(client, 107, fMul);
+		TF2R_SetAttribute(client, 107, fMul);
 	}
 
 	TriggerSpeedRecalc(client);

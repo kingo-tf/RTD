@@ -30,36 +30,36 @@ methodmap Rollers < ArrayList
 	}
 
 #define GET_PROP(%1,%2,%3) \
-	public %1 Get%2(int client){ \
+	%1 Get%2(int client){ \
 		return view_as<%1>(this.Get(client, %3));}
 
 #define SET_PROP(%1,%2,%3) \
-	public %1 Set%2(int client, %1 val){ \
+	void Set%2(int client, %1 val){ \
 		this.Set(client, val, %3);}
 
-	GET_PROP(bool,InRoll,0)
-	SET_PROP(bool,InRoll,0)
+	public GET_PROP(bool,InRoll,0)
+	public SET_PROP(bool,InRoll,0)
 
-	GET_PROP(int,LastRollTime,1)
-	SET_PROP(int,LastRollTime,1)
+	public GET_PROP(int,LastRollTime,1)
+	public SET_PROP(int,LastRollTime,1)
 
-	GET_PROP(int,EndRollTime,2)
-	SET_PROP(int,EndRollTime,2)
+	public GET_PROP(int,EndRollTime,2)
+	public SET_PROP(int,EndRollTime,2)
 
-	GET_PROP(PerkList,PerkHistory,3)
-	SET_PROP(PerkList,PerkHistory,3)
+	public GET_PROP(PerkList,PerkHistory,3)
+	public SET_PROP(PerkList,PerkHistory,3)
 
-	GET_PROP(Perk,Perk,4)
-	SET_PROP(Perk,Perk,4)
+	public GET_PROP(Perk,Perk,4)
+	public SET_PROP(Perk,Perk,4)
 
-	GET_PROP(Handle,Timer,5)
-	SET_PROP(Handle,Timer,5)
+	public GET_PROP(Handle,Timer,5)
+	public SET_PROP(Handle,Timer,5)
 
-	GET_PROP(Handle,Hud,6)
-	SET_PROP(Handle,Hud,6)
+	public GET_PROP(Handle,Hud,6)
+	public SET_PROP(Handle,Hud,6)
 
-	GET_PROP(int,UnconsumedAddedTime,7)
-	SET_PROP(int,UnconsumedAddedTime,7)
+	public GET_PROP(int,UnconsumedAddedTime,7)
+	public SET_PROP(int,UnconsumedAddedTime,7)
 
 #undef SET_PROP
 #undef GET_PROP

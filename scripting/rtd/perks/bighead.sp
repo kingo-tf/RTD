@@ -18,7 +18,7 @@
 
 #define Scale Float[0]
 
-DEFINE_CALL_APPLY_REMOVE(BigHead)
+public DEFINE_CALL_APPLY_REMOVE(BigHead)
 
 public void BigHead_Init(const Perk perk)
 {
@@ -31,12 +31,12 @@ public void BigHead_ApplyPerk(const int client, const Perk perk)
 
 	Cache[client].Scale = fScale;
 
-	TF2Attrib_SetByDefIndex(client, Attribs.VoicePitch, 1.0 / Min(fScale, 3.0));
+	TF2R_SetAttribute(client, Attribs.VoicePitch, 1.0 / Min(fScale, 3.0));
 }
 
 public void BigHead_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
-	TF2Attrib_RemoveByDefIndex(client, Attribs.VoicePitch);
+	TF2R_RemoveAttribute(client, Attribs.VoicePitch);
 }
 
 bool BigHead_OnPlayerRunCmd(const int client, int& iButtons, float fVel[3], float fAng[3])

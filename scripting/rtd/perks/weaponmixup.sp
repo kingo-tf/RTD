@@ -18,7 +18,7 @@
 
 #define Ticks Int[0]
 
-DEFINE_CALL_APPLY_REMOVE(WeaponMixup)
+public DEFINE_CALL_APPLY_REMOVE(WeaponMixup)
 
 public void WeaponMixup_Init(const Perk perk)
 {
@@ -47,9 +47,9 @@ public void WeaponMixup_RemovePerk(const int client, const RTDRemoveReason eRemo
 		if (iWeapon <= MaxClients || !IsValidEntity(iWeapon))
 			continue;
 
-		TF2Attrib_RemoveByDefIndex(iWeapon, Attribs.DeploySpeed);
-		TF2Attrib_RemoveByDefIndex(iWeapon, Attribs.ReloadSpeed);
-		TF2Attrib_RemoveByDefIndex(iWeapon, Attribs.SilentRev);
+		TF2R_RemoveAttribute(iWeapon, Attribs.DeploySpeed);
+		TF2R_RemoveAttribute(iWeapon, Attribs.ReloadSpeed);
+		TF2R_RemoveAttribute(iWeapon, Attribs.SilentRev);
 	}
 }
 
@@ -61,9 +61,9 @@ void WeaponMixup_Apply(const int client)
 		if (iWeapon <= MaxClients || !IsValidEntity(iWeapon))
 			continue;
 
-		TF2Attrib_SetByDefIndex(iWeapon, Attribs.DeploySpeed, 0.5);
-		TF2Attrib_SetByDefIndex(iWeapon, Attribs.ReloadSpeed, 0.1);
-		TF2Attrib_SetByDefIndex(iWeapon, Attribs.SilentRev, 1.0);
+		TF2R_SetAttribute(iWeapon, Attribs.DeploySpeed, 0.5);
+		TF2R_SetAttribute(iWeapon, Attribs.ReloadSpeed, 0.1);
+		TF2R_SetAttribute(iWeapon, Attribs.SilentRev, 1.0);
 	}
 }
 

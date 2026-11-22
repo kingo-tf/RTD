@@ -18,7 +18,7 @@
 
 #define Scale Float[0]
 
-DEFINE_CALL_APPLY_REMOVE(OverhealBonus)
+public DEFINE_CALL_APPLY_REMOVE(OverhealBonus)
 
 public void OverhealBonus_Init(const Perk perk)
 {
@@ -37,7 +37,7 @@ public void OverhealBonus_RemovePerk(const int client, const RTDRemoveReason eRe
 {
 	int iMediGun = GetPlayerWeaponSlot(client, 1);
 	if (iMediGun > MaxClients && IsValidEntity(iMediGun))
-		TF2Attrib_RemoveByDefIndex(iMediGun, Attribs.OverhealBonus);
+		TF2R_RemoveAttribute(iMediGun, Attribs.OverhealBonus);
 }
 
 void OverhealBonus_Apply(const int client)
@@ -46,7 +46,7 @@ void OverhealBonus_Apply(const int client)
 	if (iMediGun <= MaxClients || !IsValidEntity(iMediGun))
 		return;
 
-	TF2Attrib_SetByDefIndex(iMediGun, Attribs.OverhealBonus, Cache[client].Scale);
+	TF2R_SetAttribute(iMediGun, Attribs.OverhealBonus, Cache[client].Scale);
 }
 
 public void OverhealBonus_OnDroppedWeaponSpawn(const int client, const int iEnt)
