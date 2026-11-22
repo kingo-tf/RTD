@@ -1,0 +1,88 @@
+name: Release
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  SM_BRANCH: "1.13"
+  # tf2r_attributes.inc is not part of stock SourceMod, it comes from this fork.
+  TF2R_INCLUDE_URL: https://raw.githubusercontent.com/kingo-tf/sourcemod/master/plugins/include/tf2r_attributes.inc
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read plugin version
+        id: version
+        run: |
+          version=$(grep -m1 '#define PLUGIN_VERSION' scripting/rtd.sp | cut -d '"' -f2)
+          if [ -z "$version" ]; then
+            echo "Could not read PLUGIN_VERSION from scripting/rtd.sp" >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=v$version-$GITHUB_RUN_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "sha=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      - name: Download SourceMod compiler
+        run: |
+          base="https://sm.alliedmods.net/smdrop/$SM_BRANCH"
+          latest=$(curl -fsSL "$base/sourcemod-latest-linux")
+          echo "Using $latest"
+          mkdir -p "$RUNNER_TEMP/sourcemod"
+          curl -fsSL "$base/$latest" | tar -xz -C "$RUNNER_TEMP/sourcemod" addons/sourcemod/scripting
+          echo "SM_SCRIPTING=$RUNNER_TEMP/sourcemod/addons/sourcemod/scripting" >> "$GITHUB_ENV"
+
+      - name: Download tf2r_attributes.inc
+        run: |
+          mkdir -p "$RUNNER_TEMP/tf2r-include"
+          curl -fsSL "$TF2R_INCLUDE_URL" -o "$RUNNER_TEMP/tf2r-include/tf2r_attributes.inc"
+
+      - name: Compile
+        working-directory: scripting
+        run: |
+          spcomp="$SM_SCRIPTING/spcomp64"
+          [ -x "$spcomp" ] || spcomp="$SM_SCRIPTING/spcomp"
+          mkdir -p "$RUNNER_TEMP/build"
+          "$spcomp" rtd.sp \
+            -i "$SM_SCRIPTING/include" \
+            -i include \
+            -i "$RUNNER_TEMP/tf2r-include" \
+            -o "$RUNNER_TEMP/build/rtd.smx"
+          test -s "$RUNNER_TEMP/build/rtd.smx"
+
+      - name: Package
+        id: package
+        run: |
+          name="rtd-${{ steps.version.outputs.version }}-${{ steps.version.outputs.sha }}"
+          pkg="$RUNNER_TEMP/package"
+          mkdir -p "$pkg/plugins" "$pkg/scripting/include"
+          cp "$RUNNER_TEMP/build/rtd.smx" "$pkg/plugins/"
+          cp -r configs translations "$pkg/"
+          cp scripting/rtd.sp "$pkg/scripting/"
+          cp -r scripting/rtd "$pkg/scripting/"
+          cp scripting/include/rtd2.inc "$pkg/scripting/include/"
+          (cd "$pkg" && zip -qr "$RUNNER_TEMP/$name.zip" .)
+          echo "zip=$RUNNER_TEMP/$name.zip" >> "$GITHUB_OUTPUT"
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ steps.version.outputs.tag }}" \
+            "${{ steps.package.outputs.zip }}" \
+            "$RUNNER_TEMP/build/rtd.smx" \
+            --target "$GITHUB_SHA" \
+            --title "RTD ${{ steps.version.outputs.version }} (build $GITHUB_RUN_NUMBER, ${{ steps.version.outputs.sha }})" \
+            --generate-notes
